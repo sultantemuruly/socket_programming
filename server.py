@@ -15,7 +15,7 @@ def get_local_ip():
     return ip_address
 
 
-PORT = 5052
+PORT = 5056
 SERVER = get_local_ip()
 ADDR = (SERVER, PORT)
 
@@ -41,7 +41,8 @@ def handle_client(conn, addr):
             if msg == DISCONNECT_MESSAGE:
                 connected = False
 
-        print(f"[{addr}] [{msg}]")
+            print(f"[{addr}] [{msg}]")
+            conn.send("Msg received".encode(FORMAT))
 
     conn.close()
 
