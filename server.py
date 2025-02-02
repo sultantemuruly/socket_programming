@@ -15,7 +15,7 @@ def get_local_ip():
     return ip_address
 
 
-PORT = 5050
+PORT = 5052
 SERVER = get_local_ip()
 ADDR = (SERVER, PORT)
 
@@ -32,10 +32,14 @@ def handle_client(conn, addr):
 
     connected = True
     while connected:
-        msg_length = int(conn.recv(HEADER).decode(FORMAT))
-        msg = conn.recv(msg_length).decode(FORMAT)
-        if msg == DISCONNECT_MESSAGE:
-            connected = False
+        msg_length_raw = conn.recv(HEADER).decode(FORMAT)
+
+        if msg_length_raw:
+            msg_length = len(msg_length_raw)
+            msg = conn.recv(msg_length).decode(FORMAT)
+
+            if msg == DISCONNECT_MESSAGE:
+                connected = False
 
         print(f"[{addr}] [{msg}]")
 
