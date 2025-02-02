@@ -1,5 +1,6 @@
 import socket
 import threading
+import pickle
 from constants import *
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -11,17 +12,25 @@ def handle_client(conn, addr):
 
     connected = True
     while connected:
-        msg_length_raw = conn.recv(HEADER).decode(FORMAT)
+        msg_length_raw = conn.recv(HEADER)
 
         if msg_length_raw:
-            msg_length = len(msg_length_raw)
-            msg = conn.recv(msg_length).decode(FORMAT)
+            try:
+                msg_length = int(msg_length_raw.decode(FORMAT).strip())
+                msg = conn.recv(msg_length)
 
-            if msg == DISCONNECT_MESSAGE:
-                connected = False
-
-            print(f"[{addr}] [{msg}]")
-            conn.send("Msg received".encode(FORMAT))
+                try:
+                    msg_decoded = msg.decode(FORMAT)
+                    print(f"[{addr}] [STRING MESSAGE]: {msg_decoded}")
+                    if msg_decoded == DISCONNECT_MESSAGE:
+                        connected = False
+                    conn.send("Msg received".encode(FORMAT))
+                except UnicodeDecodeError:
+                    msg_object = pickle.loads(msg)
+                    print(f"[{addr}] [OBJECT RECEIVED]: {msg_object}")
+                    conn.send("Object received".encode(FORMAT))
+            except ValueError:
+                print(f"[{addr}] [INVALID MESSAGE LENGTH]")
 
     conn.close()
 

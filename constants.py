@@ -14,7 +14,7 @@ def get_local_ip():
     return ip_address
 
 
-PORT = 5050
+PORT = 5052
 SERVER = get_local_ip()
 ADDR = (SERVER, PORT)
 
